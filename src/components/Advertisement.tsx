@@ -2,9 +2,9 @@
 
 import { SidebarAd, SquareAd } from './GoogleAdsense'
 
-interface AdProps {
-  position: 'left' | 'right'
-}
+// interface AdProps {
+//   position: 'left' | 'right'
+// }
 
 export default function Advertisement() {
   return (
