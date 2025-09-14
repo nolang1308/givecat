@@ -6,7 +6,7 @@ interface AdProps {
   position: 'left' | 'right'
 }
 
-export default function Advertisement({ position }: AdProps) {
+export default function Advertisement() {
   return (
     <div className="space-y-6">
       <div className="text-center mb-4">

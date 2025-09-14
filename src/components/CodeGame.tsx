@@ -49,7 +49,7 @@ export default function CodeGame({ onSuccess, disabled, codeHash, salt }: CodeGa
           })
         })
 
-        const result = await response.json()
+        await response.json()
         
         stopGame()
         onSuccess()

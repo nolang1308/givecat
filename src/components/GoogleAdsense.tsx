@@ -17,9 +17,9 @@ export default function GoogleAdsense({
 }: GoogleAdsenseProps) {
   useEffect(() => {
     try {
-      // @ts-ignore
+      // @ts-expect-error - Google AdSense global object
       if (typeof window !== 'undefined' && window.adsbygoogle) {
-        // @ts-ignore
+        // @ts-expect-error - Google AdSense push method
         window.adsbygoogle.push({})
       }
     } catch (error) {
