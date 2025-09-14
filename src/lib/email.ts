@@ -76,7 +76,7 @@ export async function sendWinnerNotification(data: WinnerNotificationData) {
     return { success: true, messageId: result.messageId }
   } catch (error) {
     console.error('❌ Failed to send winner notification email:', error)
-    console.error('🔍 Error details:', error.message)
+    console.error('🔍 Error details:', error instanceof Error ? error.message : String(error))
     return { success: false, error: error }
   }
 }
