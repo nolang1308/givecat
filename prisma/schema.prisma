@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  nickname  String
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  attempts CodeAttempt[]
+  @@map("users")
+}
+
+model DailyCode {
+  id        String   @id @default(cuid())
+  date      String   @unique // YYYY-MM-DD format
+  code      String   // 10자리 코드
+  productName String
+  productImage String
+  createdAt DateTime @default(now())
+  
+  attempts CodeAttempt[]
+  @@map("daily_codes")
+}
+
+model CodeAttempt {
+  id        String   @id @default(cuid())
+  userId    String
+  codeId    String
+  success   Boolean  @default(false)
+  attemptedAt DateTime @default(now())
+  
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  code      DailyCode @relation(fields: [codeId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, codeId])
+  @@map("code_attempts")
+}
