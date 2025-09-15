@@ -1,4 +1,6 @@
-@use "tailwindcss";
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
 
 // 따뜻한 방 테마 색상 (단색)
 $room-bg: #fef7ed;
