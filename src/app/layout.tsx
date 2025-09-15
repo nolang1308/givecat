@@ -40,25 +40,22 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <head>
-        <link rel="canonical" href="/" />
-        <meta name="theme-color" content="#4F46E5" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-        <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-        
-        {/* Google AdSense */}
-        <script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXXX"
-          crossOrigin="anonymous"
-        />
-      </head>
-      <body
+    <head>
+      <link rel="canonical" href="/"/>
+      <meta name="theme-color" content="#4F46E5"/>
+      <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+      <link rel="icon" type="image/x-icon" href="/favicon.ico"/>
+
+      {/* Google AdSense */}
+      <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9734166484318003"
+              crossOrigin="anonymous"></script>
+    </head>
+    <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+    >
+    <AuthProvider>
+      {children}
+    </AuthProvider>
       </body>
     </html>
   );

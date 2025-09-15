@@ -99,15 +99,10 @@ export default function Home() {
         {/* 벽에 걸린 전광판 */}
         <ElectronicBoard successfulNicknames={dailyData.successfulNicknames} />
 
-        {/* 방 레이아웃: 광고 - 액자 - 고양이존 - 액자 - 광고 */}
+        {/* 방 레이아웃: 액자 - 고양이존 - 액자 */}
         <div className="room-layout">
-          {/* 왼쪽 광고 영역 */}
-          <div className="side-decoration flex flex-col items-center gap-4">
-            <Advertisement />
-          </div>
-
-          {/* 왼쪽 벽 - 상품 액자 */}
-          <div className="side-decoration flex flex-col items-center">
+          {/* 왼쪽 벽 - 상품 액자 + 광고 */}
+          <div className="side-decoration flex flex-col items-center gap-6">
             <div className="product-frame">
               <div className="product-image-container">
                 <Image
@@ -126,6 +121,8 @@ export default function Home() {
                 {dailyData.productName}
               </div>
             </div>
+            {/* 왼쪽 액자 밑 광고 */}
+            <Advertisement />
           </div>
 
           {/* 가운데 - 고양이존 */}
@@ -150,8 +147,8 @@ export default function Home() {
             </div>
           </div>
 
-          {/* 오른쪽 벽 - 상품 액자 (다른 각도) */}
-          <div className="side-decoration flex flex-col items-center">
+          {/* 오른쪽 벽 - 상품 액자 + 광고 */}
+          <div className="side-decoration flex flex-col items-center gap-6">
             <div className="product-frame">
               <div className="product-image-container">
                 <Image
@@ -168,13 +165,9 @@ export default function Home() {
               </div>
               <div className="product-label">
                 {dailyData.productName}
-
               </div>
             </div>
-          </div>
-
-          {/* 오른쪽 광고 영역 */}
-          <div className="side-decoration flex flex-col items-center gap-4">
+            {/* 오른쪽 액자 밑 광고 */}
             <Advertisement />
           </div>
         </div>
