@@ -15,6 +15,8 @@ export default function CodeGame({ onSuccess, disabled, codeHash, salt }: CodeGa
   const [currentCode, setCurrentCode] = useState('')
   const [isRunning, setIsRunning] = useState(false)
   const [catPressed, setCatPressed] = useState(false) // 고양이가 버튼을 눌렀는지
+  const [manualInput, setManualInput] = useState('') // 사용자 직접 입력
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
   const generateAndDisplayCode = () => {
@@ -95,6 +97,32 @@ export default function CodeGame({ onSuccess, disabled, codeHash, salt }: CodeGa
     }
   }
 
+  const handleManualSubmit = async () => {
+    if (!manualInput.trim() || isSubmitting) return
+    
+    setIsSubmitting(true)
+    
+    try {
+      const isSuccess = await checkCode(manualInput.trim())
+      if (!isSuccess) {
+        // 틀렸을 때 입력 필드 초기화
+        setManualInput('')
+        alert('틀렸습니다! 다시 시도해보세요 😿')
+      }
+    } catch (error) {
+      console.error('Manual code submission error:', error)
+      alert('오류가 발생했습니다. 다시 시도해주세요.')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleInputKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleManualSubmit()
+    }
+  }
+
   useEffect(() => {
     return () => {
       if (intervalRef.current) {
@@ -134,15 +162,43 @@ export default function CodeGame({ onSuccess, disabled, codeHash, salt }: CodeGa
           />
         </div>
 
-        {/* 시작/중지 버튼 */}
-        <div className="flex justify-center">
+        {/* 시작/중지 버튼 및 수동 입력 */}
+        <div className="flex flex-col items-center gap-4">
           {!isRunning ? (
-            <button
-              onClick={startGame}
-              className="cozy-btn text-xl px-10 py-4"
-            >
-              🐾시작🐾
-            </button>
+            <>
+              <button
+                onClick={startGame}
+                className="cozy-btn text-xl px-10 py-4"
+              >
+                🐾시작🐾
+              </button>
+              
+              {/* 수동 입력 영역 */}
+              <div className="manual-input-section">
+                <p className="text-sm text-gray-600 mb-2 text-center">
+                  또는 직접 코드를 입력해보세요
+                </p>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={manualInput}
+                    onChange={(e) => setManualInput(e.target.value.toLowerCase())}
+                    onKeyPress={handleInputKeyPress}
+                    placeholder="10자리 코드 입력"
+                    maxLength={10}
+                    className="px-3 py-2 border border-amber-300 rounded-lg bg-amber-50 focus:outline-none focus:border-amber-500 text-center font-mono text-lg"
+                    disabled={isSubmitting}
+                  />
+                  <button
+                    onClick={handleManualSubmit}
+                    disabled={!manualInput.trim() || isSubmitting}
+                    className="px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                  >
+                    {isSubmitting ? '확인중...' : '확인'}
+                  </button>
+                </div>
+              </div>
+            </>
           ) : (
             <button
               onClick={stopGame}
