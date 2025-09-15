@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import CodeGame from '@/components/CodeGame'
 import ElectronicBoard from '@/components/ElectronicBoard'
+import Advertisement from '@/components/Advertisement'
 
 interface DailyData {
   productName: string
@@ -98,8 +99,13 @@ export default function Home() {
         {/* 벽에 걸린 전광판 */}
         <ElectronicBoard successfulNicknames={dailyData.successfulNicknames} />
 
-        {/* 방 레이아웃: 액자 - 고양이존 - 액자 */}
+        {/* 방 레이아웃: 광고 - 액자 - 고양이존 - 액자 - 광고 */}
         <div className="room-layout">
+          {/* 왼쪽 광고 영역 */}
+          <div className="side-decoration flex flex-col items-center gap-4">
+            <Advertisement />
+          </div>
+
           {/* 왼쪽 벽 - 상품 액자 */}
           <div className="side-decoration flex flex-col items-center">
             <div className="product-frame">
@@ -165,6 +171,11 @@ export default function Home() {
 
               </div>
             </div>
+          </div>
+
+          {/* 오른쪽 광고 영역 */}
+          <div className="side-decoration flex flex-col items-center gap-4">
+            <Advertisement />
           </div>
         </div>
       </div>

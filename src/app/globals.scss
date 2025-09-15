@@ -321,12 +321,17 @@ body {
 // 레이아웃
 .room-layout {
   display: grid;
-  grid-template-columns: 300px 1fr 300px;
-  gap: 40px;
+  grid-template-columns: 250px 250px 1fr 250px 250px;
+  gap: 20px;
   align-items: start;
-  max-width: 1400px;
+  max-width: 1600px;
   margin: 0 auto;
   padding: 0 20px;
+  
+  @media (max-width: 1400px) {
+    grid-template-columns: 200px 250px 1fr 250px 200px;
+    gap: 15px;
+  }
   
   @media (max-width: 1200px) {
     grid-template-columns: 1fr;
@@ -339,6 +344,31 @@ body {
   @media (max-width: 1200px) {
     display: none;
   }
+}
+
+// 광고 스타일
+.adsense-container {
+  width: 100%;
+  margin: 10px 0;
+  
+  .adsbygoogle {
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 4px 12px $warm-shadow;
+    overflow: hidden;
+  }
+}
+
+.sidebar-ad {
+  width: 100%;
+  max-width: 250px;
+  min-height: 250px;
+}
+
+.square-ad {
+  width: 100%;
+  max-width: 200px;
+  height: 200px;
 }
 
 // 로그인/회원가입 페이지 스타일
