@@ -73,7 +73,6 @@ export async function POST(request: NextRequest) {
         success: isCorrect
       }
     })
-
     console.log('✅ Upsert result:', upsertResult)
 
     if (isCorrect) {
