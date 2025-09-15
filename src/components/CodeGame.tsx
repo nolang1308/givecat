@@ -37,7 +37,9 @@ export default function CodeGame({ onSuccess, disabled, codeHash, salt }: CodeGa
   const playSuccessSound = () => {
     // Web Audio API를 사용한 성공 사운드 생성
     try {
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
+      const AudioContextClass = window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext
+      if (!AudioContextClass) throw new Error('AudioContext not supported')
+      const audioContext = new AudioContextClass()
       
       // 성공 사운드 (상승하는 멜로디)
       const frequencies = [523.25, 659.25, 783.99, 1046.50] // C5, E5, G5, C6
