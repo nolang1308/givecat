@@ -681,3 +681,55 @@ body {
 .ads-section {
   margin-top: 30px;
 }
+
+// 통합된 게임 박스 스타일
+.unified-game-box {
+  background: rgba(255, 251, 235, 0.8);
+  border-radius: 30px;
+  padding: 40px;
+  margin: 40px auto;
+  max-width: 1400px;
+  box-shadow: 
+    0 20px 40px $warm-shadow,
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+  border: 3px solid rgba(254, 215, 170, 0.5);
+  position: relative;
+  
+  .room-layout {
+    display: grid;
+    grid-template-columns: 300px 1fr 300px;
+    gap: 40px;
+    align-items: start;
+    padding: 0;
+    margin: 0;
+    
+    @media (max-width: 1200px) {
+      grid-template-columns: 1fr;
+      gap: 30px;
+      text-align: center;
+    }
+  }
+  
+  .side-decoration {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    min-height: 600px; // 최소 높이를 설정하여 높이 맞춤
+    justify-content: flex-start;
+    
+    @media (max-width: 1200px) {
+      display: none;
+    }
+  }
+  
+  // 중앙 고양이 존의 높이도 맞춤
+  > .room-layout > div:nth-child(2) {
+    min-height: 600px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+}

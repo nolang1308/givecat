@@ -3,8 +3,10 @@
 import { useEffect, useState } from 'react'
 import { useSession, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import GameCenter from '@/components/GameCenter'
+import Image from 'next/image'
+import CodeGame from '@/components/CodeGame'
 import ElectronicBoard from '@/components/ElectronicBoard'
+import Advertisement from '@/components/Advertisement'
 
 interface DailyData {
   productName: string
@@ -97,15 +99,80 @@ export default function Home() {
         {/* 벽에 걸린 전광판 */}
         <ElectronicBoard successfulNicknames={dailyData.successfulNicknames} />
 
-        {/* 통합된 게임 센터 */}
-        <GameCenter 
-          productName={dailyData.productName}
-          productImage={dailyData.productImage}
-          onSuccess={handleGameSuccess}
-          disabled={gameCompleted}
-          codeHash={dailyData.codeHash}
-          salt={dailyData.salt}
-        />
+        {/* 통합된 게임 박스 */}
+        <div className="unified-game-box">
+          {/* 방 레이아웃: 액자 - 고양이존 - 액자 */}
+          <div className="room-layout">
+            {/* 왼쪽 벽 - 상품 액자 + 광고 */}
+            <div className="side-decoration flex flex-col items-center gap-6">
+              <div className="product-frame">
+                <div className="product-image-container">
+                  <Image
+                    src={dailyData.productImage}
+                    alt={dailyData.productName}
+                    width={240}
+                    height={240}
+                    className="object-cover rounded-lg w-full h-full"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement
+                      target.src = '/placeholder-product.jpg'
+                    }}
+                  />
+                </div>
+                <div className="product-label">
+                  {dailyData.productName}
+                </div>
+              </div>
+              {/* 왼쪽 액자 밑 광고 */}
+              <Advertisement />
+            </div>
+
+            {/* 가운데 - 고양이존 */}
+            <div>
+              <CodeGame 
+                onSuccess={handleGameSuccess}
+                disabled={gameCompleted}
+                codeHash={dailyData.codeHash}
+                salt={dailyData.salt}
+              />
+              <div className="letter">
+                {"고양이가 버튼을 눌러 코드를 생성합니다."}
+                <br />
+                {"코드는 알파벳 a~z, 숫자 0~9로 구성된 10자리 코드이며"}
+                <br/>
+                {"매일 밤 한국시 기준 00시 00분에 상품과 코드가 랜덤으로 바뀌게 됩니다."}
+                <br />
+                {"고양이가 코드를 맞추면, 오늘의 상품을 선물합니다."}
+                <br />
+                {"고양이를 멈추거나, 사이트를 나가면 고양이가 버튼을 누르지 않습니다."}
+              </div>
+            </div>
+
+            {/* 오른쪽 벽 - 상품 액자 + 광고 */}
+            <div className="side-decoration flex flex-col items-center gap-6">
+              <div className="product-frame">
+                <div className="product-image-container">
+                  <Image
+                    src={dailyData.productImage}
+                    alt={dailyData.productName}
+                    width={240}
+                    height={240}
+                    className="object-cover rounded-lg w-full h-full"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement
+                      target.src = '/placeholder-product.jpg'
+                    }}
+                  />
+                </div>
+                <div className="product-label">
+                  {dailyData.productName}
+                </div>
+              </div>
+              {/* 오른쪽 액자 밑 광고 */}
+              <Advertisement />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   )
