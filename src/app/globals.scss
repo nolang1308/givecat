@@ -899,6 +899,14 @@ body {
     display: flex;
     justify-content: center;
     
+    &:first-child {
+      grid-column: 1; // 첫 번째 광고는 왼쪽
+    }
+    
+    &:last-child {
+      grid-column: 3; // 마지막 광고는 오른쪽
+    }
+    
     @media (max-width: 1200px) {
       display: none;
     }
@@ -907,5 +915,6 @@ body {
   .letter-item {
     display: flex;
     justify-content: center;
+    grid-column: 2; // 편지는 가운데
   }
 }
