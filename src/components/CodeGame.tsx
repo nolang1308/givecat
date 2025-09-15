@@ -34,12 +34,72 @@ export default function CodeGame({ onSuccess, disabled, codeHash, salt }: CodeGa
     return hashHex
   }
 
+  const playSuccessSound = () => {
+    // Web Audio API를 사용한 성공 사운드 생성
+    try {
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
+      
+      // 성공 사운드 (상승하는 멜로디)
+      const frequencies = [523.25, 659.25, 783.99, 1046.50] // C5, E5, G5, C6
+      
+      frequencies.forEach((freq, index) => {
+        const oscillator = audioContext.createOscillator()
+        const gainNode = audioContext.createGain()
+        
+        oscillator.connect(gainNode)
+        gainNode.connect(audioContext.destination)
+        
+        oscillator.frequency.setValueAtTime(freq, audioContext.currentTime)
+        oscillator.type = 'triangle'
+        
+        const startTime = audioContext.currentTime + (index * 0.15)
+        const endTime = startTime + 0.3
+        
+        gainNode.gain.setValueAtTime(0, startTime)
+        gainNode.gain.linearRampToValueAtTime(0.1, startTime + 0.05)
+        gainNode.gain.exponentialRampToValueAtTime(0.01, endTime)
+        
+        oscillator.start(startTime)
+        oscillator.stop(endTime)
+      })
+    } catch (error) {
+      console.log('Audio not supported:', error)
+    }
+  }
+
+  const showSuccessNotification = () => {
+    // 브라우저 알림 권한 요청 및 표시
+    if ('Notification' in window) {
+      if (Notification.permission === 'granted') {
+        new Notification('🎉 GIFT CAT', {
+          body: '축하합니다! 코드를 맞추셨습니다! 🐱🎁',
+          icon: '/cat_2.png',
+          tag: 'gift-cat-success'
+        })
+      } else if (Notification.permission !== 'denied') {
+        Notification.requestPermission().then(permission => {
+          if (permission === 'granted') {
+            new Notification('🎉 GIFT CAT', {
+              body: '축하합니다! 코드를 맞추셨습니다! 🐱🎁',
+              icon: '/cat_2.png',
+              tag: 'gift-cat-success'
+            })
+          }
+        })
+      }
+    }
+  }
+
   const checkCode = async (code: string) => {
     // 클라이언트 사이드에서 해시 비교
     const clientHash = await hashCodeClient(code)
     
     if (clientHash === codeHash) {
-      // 성공! 서버에 알림
+      // 성공! 사운드와 알림 재생
+      playSuccessSound()
+      showSuccessNotification()
+      
+      // 서버에 알림
       try {
         const response = await fetch('/api/attempt-code', {
           method: 'POST',
@@ -124,6 +184,11 @@ export default function CodeGame({ onSuccess, disabled, codeHash, salt }: CodeGa
   }
 
   useEffect(() => {
+    // 컴포넌트 마운트시 알림 권한 요청
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission()
+    }
+
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current)

@@ -22,15 +22,15 @@ export async function GET() {
     const attempts = await getTodayAttempts()
     const userAttempt = await checkUserAttempt(session.user.id)
 
-    // 성공한 사용자들의 이메일 목록 추출
-    const successfulEmails = attempts.map(attempt => attempt.user.email)
+    // 성공한 사용자들의 닉네임 목록 추출
+    const successfulNicknames = attempts.map(attempt => attempt.user.nickname)
 
     return NextResponse.json({
       productName: todayCode.productName,
       productImage: todayCode.productImage,
       successCount: attempts.length,
       hasSucceeded: userAttempt?.success || false,
-      successfulEmails: successfulEmails,
+      successfulNicknames: successfulNicknames,
       codeHash: hashCode(todayCode.code), // 해시값만 전송
       salt: process.env.NEXTAUTH_SECRET // 클라이언트 해싱용 salt
     })

@@ -12,7 +12,7 @@ interface DailyData {
   productImage: string
   successCount: number
   hasSucceeded: boolean
-  successfulEmails: string[]
+  successfulNicknames: string[]
   codeHash: string
   salt: string
 }
@@ -96,7 +96,7 @@ export default function Home() {
         </div>
 
         {/* 벽에 걸린 전광판 */}
-        <ElectronicBoard successfulEmails={dailyData.successfulEmails} />
+        <ElectronicBoard successfulNicknames={dailyData.successfulNicknames} />
 
         {/* 방 레이아웃: 액자 - 고양이존 - 액자 */}
         <div className="room-layout">

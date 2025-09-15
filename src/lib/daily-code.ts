@@ -47,7 +47,7 @@ export async function getTodayAttempts() {
     include: {
       user: {
         select: {
-          email: true
+          nickname: true
         }
       }
     }
