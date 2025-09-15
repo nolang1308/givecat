@@ -83,6 +83,9 @@ export default function Home() {
           <div className="welcome-text">
             GIFT CAT
           </div>
+          <div className="header-center">
+            <ElectronicBoard successfulNicknames={dailyData.successfulNicknames} />
+          </div>
           <div className="flex items-center gap-4">
             <span className="welcome-text text-base">
               {session.user?.nickname}님 어서오세요! 🏠
@@ -96,15 +99,11 @@ export default function Home() {
           </div>
         </div>
 
-        {/* 벽에 걸린 전광판 */}
-        <ElectronicBoard successfulNicknames={dailyData.successfulNicknames} />
-
-        {/* 통합된 게임 박스 */}
-        <div className="unified-game-box">
-          {/* 방 레이아웃: 액자 - 고양이존 - 액자 */}
-          <div className="room-layout">
-            {/* 왼쪽 벽 - 상품 액자 + 광고 */}
-            <div className="side-decoration flex flex-col items-center gap-6">
+        {/* 액자-고양이-액자 박스 */}
+        <div className="game-frames-box">
+          <div className="frames-layout">
+            {/* 왼쪽 액자 */}
+            <div className="frame-item">
               <div className="product-frame">
                 <div className="product-image-container">
                   <Image
@@ -123,18 +122,52 @@ export default function Home() {
                   {dailyData.productName}
                 </div>
               </div>
-              {/* 왼쪽 액자 밑 광고 */}
-              <Advertisement />
             </div>
 
             {/* 가운데 - 고양이존 */}
-            <div>
+            <div className="cat-item">
               <CodeGame 
                 onSuccess={handleGameSuccess}
                 disabled={gameCompleted}
                 codeHash={dailyData.codeHash}
                 salt={dailyData.salt}
               />
+            </div>
+
+            {/* 오른쪽 액자 */}
+            <div className="frame-item">
+              <div className="product-frame">
+                <div className="product-image-container">
+                  <Image
+                    src={dailyData.productImage}
+                    alt={dailyData.productName}
+                    width={240}
+                    height={240}
+                    className="object-cover rounded-lg w-full h-full"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement
+                      target.src = '/placeholder-product.jpg'
+                    }}
+                  />
+                </div>
+                <div className="product-label">
+                  {dailyData.productName}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 박스 밑 - 광고, 편지, 광고 */}
+        <div className="bottom-content">
+          <div className="bottom-layout">
+            {/* 왼쪽 광고 */}
+            <div className="ad-item">
+              <Advertisement />
+            </div>
+
+            {/* 가운데 편지 */}
+            <div className="letter-item">
               <div className="letter">
                 {"고양이가 버튼을 눌러 코드를 생성합니다."}
                 <br />
@@ -148,27 +181,8 @@ export default function Home() {
               </div>
             </div>
 
-            {/* 오른쪽 벽 - 상품 액자 + 광고 */}
-            <div className="side-decoration flex flex-col items-center gap-6">
-              <div className="product-frame">
-                <div className="product-image-container">
-                  <Image
-                    src={dailyData.productImage}
-                    alt={dailyData.productName}
-                    width={240}
-                    height={240}
-                    className="object-cover rounded-lg w-full h-full"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement
-                      target.src = '/placeholder-product.jpg'
-                    }}
-                  />
-                </div>
-                <div className="product-label">
-                  {dailyData.productName}
-                </div>
-              </div>
-              {/* 오른쪽 액자 밑 광고 */}
+            {/* 오른쪽 광고 */}
+            <div className="ad-item">
               <Advertisement />
             </div>
           </div>

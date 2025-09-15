@@ -215,7 +215,7 @@ export default function CodeGame({ onSuccess, disabled, codeHash, salt }: CodeGa
       <div className="cat-zone">
         {/* 말풍선 (고양이 위) */}
         <div className="speech-bubble">
-          {currentCode || 'START를 눌러주세요 😸'}
+          {currentCode || '코드를 생성해주겠다 냥!'}
         </div>
 
         {/* 고양이 이미지 */}
@@ -245,7 +245,7 @@ export default function CodeGame({ onSuccess, disabled, codeHash, salt }: CodeGa
                 <p className="text-sm text-gray-600 mb-2 text-center">
                   또는 직접 코드를 입력해보세요
                 </p>
-                <div className="flex gap-2">
+                <div className="manual-input-container">
                   <input
                     type="text"
                     value={manualInput}
@@ -253,13 +253,13 @@ export default function CodeGame({ onSuccess, disabled, codeHash, salt }: CodeGa
                     onKeyPress={handleInputKeyPress}
                     placeholder="10자리 코드 입력"
                     maxLength={10}
-                    className="px-3 py-2 border border-amber-300 rounded-lg bg-amber-50 focus:outline-none focus:border-amber-500 text-center font-mono text-lg"
+                    className="manual-input-field px-3 py-2 border border-amber-300 rounded-lg bg-amber-50 focus:outline-none focus:border-amber-500 text-center font-mono text-lg"
                     disabled={isSubmitting}
                   />
                   <button
                     onClick={handleManualSubmit}
                     disabled={!manualInput.trim() || isSubmitting}
-                    className="px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                    className="manual-confirm-btn px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
                   >
                     {isSubmitting ? '확인중...' : '확인'}
                   </button>
