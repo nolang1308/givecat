@@ -18,10 +18,15 @@ interface DailyData {
   salt: string
 }
 
+interface UpgradeStatus {
+  isUpgraded: boolean
+}
+
 export default function Home() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const [dailyData, setDailyData] = useState<DailyData | null>(null)
+  const [upgradeStatus, setUpgradeStatus] = useState<UpgradeStatus>({ isUpgraded: false })
   const [loading, setLoading] = useState(true)
   const [gameCompleted, setGameCompleted] = useState(false)
 
@@ -34,6 +39,7 @@ export default function Home() {
     }
 
     fetchDailyData()
+    fetchUpgradeStatus()
   }, [session, status, router])
 
   const fetchDailyData = async () => {
@@ -51,9 +57,25 @@ export default function Home() {
     }
   }
 
+  const fetchUpgradeStatus = async () => {
+    try {
+      const response = await fetch('/api/upgrade')
+      if (response.ok) {
+        const data = await response.json()
+        setUpgradeStatus(data)
+      }
+    } catch (error) {
+      console.error('Failed to fetch upgrade status:', error)
+    }
+  }
+
   const handleGameSuccess = () => {
     setGameCompleted(true)
     fetchDailyData()
+  }
+
+  const handleUpgradeComplete = () => {
+    setUpgradeStatus({ isUpgraded: true })
   }
 
   const handleLogout = () => {
@@ -131,6 +153,8 @@ export default function Home() {
                 disabled={gameCompleted}
                 codeHash={dailyData.codeHash}
                 salt={dailyData.salt}
+                isUpgraded={upgradeStatus.isUpgraded}
+                onUpgradeComplete={handleUpgradeComplete}
               />
             </div>
 

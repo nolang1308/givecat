@@ -3,20 +3,24 @@
 import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { generateRandomCode } from '@/lib/daily-code'
+import UpgradeButton from './UpgradeButton'
 
 interface CodeGameProps {
   onSuccess: () => void
   disabled: boolean
   codeHash: string
   salt: string
+  isUpgraded?: boolean
+  onUpgradeComplete?: () => void
 }
 
-export default function CodeGame({ onSuccess, disabled, codeHash, salt }: CodeGameProps) {
+export default function CodeGame({ onSuccess, disabled, codeHash, salt, isUpgraded: initialUpgraded = false, onUpgradeComplete }: CodeGameProps) {
   const [currentCode, setCurrentCode] = useState('')
   const [isRunning, setIsRunning] = useState(false)
   const [catPressed, setCatPressed] = useState(false) // 고양이가 버튼을 눌렀는지
   const [manualInput, setManualInput] = useState('') // 사용자 직접 입력
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isUpgraded, setIsUpgraded] = useState(initialUpgraded) // 내부 업그레이드 상태
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
   const generateAndDisplayCode = () => {
@@ -148,7 +152,7 @@ export default function CodeGame({ onSuccess, disabled, codeHash, salt }: CodeGa
       
       // 코드 체크
       await checkCode(code)
-    }, 1500) // 1.5초마다 반복
+    }, isUpgraded ? 300 : 1000) // 업그레이드 시 0.3초, 기본 1초
   }
 
   const stopGame = () => {
@@ -185,6 +189,18 @@ export default function CodeGame({ onSuccess, disabled, codeHash, salt }: CodeGa
     }
   }
 
+  const handleUpgrade = () => {
+    setIsUpgraded(true)
+    onUpgradeComplete?.()
+    // 게임이 실행 중이라면 새로운 속도로 재시작
+    if (isRunning) {
+      stopGame()
+      setTimeout(() => {
+        startGame()
+      }, 100)
+    }
+  }
+
   useEffect(() => {
     // 컴포넌트 마운트시 알림 권한 요청
     if ('Notification' in window && Notification.permission === 'default') {
@@ -218,15 +234,26 @@ export default function CodeGame({ onSuccess, disabled, codeHash, salt }: CodeGa
           {currentCode || '코드를 생성해주겠다 냥!'}
         </div>
 
-        {/* 고양이 이미지 */}
-        <div className="flex justify-center mb-6">
-          <Image
-            src={catPressed ? "/cat_1.png" : "/cat_2.png"}
-            alt={catPressed ? "버튼을 누르는 고양이" : "팔을 올린 고양이"}
-            width={250}
-            height={250}
-            className="transition-all duration-300"
-          />
+        {/* 고양이 이미지와 업그레이드 버튼 */}
+        <div className="flex justify-center items-center mb-6">
+          <div className="relative flex items-center justify-center">
+            {/* 고양이 이미지 (중앙) */}
+            <Image
+              src={catPressed ? "/cat_1.png" : "/cat_2.png"}
+              alt={catPressed ? "버튼을 누르는 고양이" : "팔을 올린 고양이"}
+              width={250}
+              height={250}
+              className="transition-all duration-300"
+            />
+            
+            {/* 업그레이드 버튼 (고양이 오른쪽) */}
+            <div className="absolute right-[-80px] top-1/2 transform -translate-y-1/2">
+              <UpgradeButton 
+                isUpgraded={isUpgraded} 
+                onUpgrade={handleUpgrade}
+              />
+            </div>
+          </div>
         </div>
 
         {/* 시작/중지 버튼 및 수동 입력 */}
