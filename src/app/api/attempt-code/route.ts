@@ -49,7 +49,14 @@ export async function POST(request: NextRequest) {
     const todayCode = await getTodayCode()
     const isCorrect = attemptedCode === todayCode.code
 
-    await prisma.codeAttempt.upsert({
+    console.log('🔍 Debug info:')
+    console.log('- User ID:', session.user.id)
+    console.log('- Code ID:', todayCode.id)
+    console.log('- Attempted code:', attemptedCode)
+    console.log('- Today code:', todayCode.code)
+    console.log('- Is correct:', isCorrect)
+
+    const upsertResult = await prisma.codeAttempt.upsert({
       where: {
         userId_codeId: {
           userId: session.user.id,
@@ -66,6 +73,8 @@ export async function POST(request: NextRequest) {
         success: isCorrect
       }
     })
+
+    console.log('✅ Upsert result:', upsertResult)
 
     if (isCorrect) {
       // 당첨자 이메일 전송 (비동기로 처리해서 응답 지연 방지)
