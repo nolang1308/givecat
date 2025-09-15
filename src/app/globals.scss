@@ -574,3 +574,110 @@ body {
   color: $text-warm;
   text-align: center;
 }
+
+// 통합된 게임 센터 스타일
+.game-center {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 40px;
+  background: rgba(255, 251, 235, 0.9);
+  border-radius: 30px;
+  box-shadow: 
+    0 20px 40px $warm-shadow,
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  border: 3px solid rgba(254, 215, 170, 0.5);
+  text-align: center;
+}
+
+.product-display {
+  margin-bottom: 40px;
+}
+
+.product-title {
+  color: $cozy-orange;
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 30px;
+  text-shadow: 0 2px 4px rgba(255, 255, 255, 0.8);
+}
+
+.product-showcase {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.product-frame-center {
+  background: linear-gradient(145deg, $warm-wood, #b45309);
+  padding: 25px;
+  border-radius: 20px;
+  box-shadow: 
+    0 15px 30px rgba(0, 0, 0, 0.2),
+    inset 0 2px 4px rgba(255, 255, 255, 0.1);
+  position: relative;
+  max-width: 350px;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    border: 2px solid rgba(255, 251, 235, 0.3);
+    border-radius: 12px;
+  }
+}
+
+.product-image-container-center {
+  background: white;
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.product-label-center {
+  background: $soft-cream;
+  color: $text-warm;
+  padding: 12px 20px;
+  border-radius: 25px;
+  margin-top: 15px;
+  font-size: 16px;
+  font-weight: 600;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.game-section {
+  margin-bottom: 40px;
+}
+
+.game-instructions {
+  background: #fef9f3;
+  border: 2px solid #d97706;
+  border-radius: 20px;
+  padding: 25px 30px;
+  margin: 30px auto;
+  max-width: 600px;
+  box-shadow: 0 8px 16px rgba(217, 119, 6, 0.1);
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  line-height: 1.8;
+  color: #78350f;
+  text-align: center;
+  position: relative;
+  
+  &::before {
+    content: '💌';
+    position: absolute;
+    top: -10px;
+    left: 20px;
+    font-size: 24px;
+    background: #fef9f3;
+    padding: 0 8px;
+  }
+}
+
+.ads-section {
+  margin-top: 30px;
+}
