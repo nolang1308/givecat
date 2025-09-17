@@ -13,6 +13,8 @@ export async function POST(request: NextRequest) {
 
     const { paymentKey, orderId, amount } = await request.json()
     
+    console.log('Payment confirmation request:', { paymentKey, orderId, amount })
+    
     // 토스페이먼츠 결제 승인 요청
     const response = await fetch('https://api.tosspayments.com/v1/payments/confirm', {
       method: 'POST',
@@ -23,39 +25,60 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({
         paymentKey,
         orderId,
-        amount
+        amount: parseInt(amount.toString()) // 확실히 숫자로 변환
       })
     })
+    
+    console.log('Toss API response status:', response.status)
 
-    const payment = await response.json()
+    let payment
+    try {
+      payment = await response.json()
+    } catch (error) {
+      console.error('Failed to parse response JSON:', error)
+      return NextResponse.json(
+        { error: '결제 승인 응답 처리 중 오류가 발생했습니다.' },
+        { status: 500 }
+      )
+    }
 
     if (!response.ok) {
       console.error('Payment confirmation failed:', payment)
       return NextResponse.json(
-        { error: payment.message || '결제 승인에 실패했습니다.' },
+        { error: payment?.message || '결제 승인에 실패했습니다.' },
         { status: 400 }
       )
     }
 
     // 결제 성공 시 사용자 업그레이드 처리
     if (payment.status === 'DONE') {
-      await prisma.user.update({
-        where: { id: session.user.id },
-        data: { isUpgraded: true }
-      })
+      try {
+        // 사용자 업그레이드
+        await prisma.user.update({
+          where: { id: session.user.id },
+          data: { isUpgraded: true }
+        })
 
-      // 결제 내역 저장 (선택사항)
-      await prisma.payment.create({
-        data: {
-          userId: session.user.id,
-          paymentKey: payment.paymentKey,
-          orderId: payment.orderId,
-          amount: payment.totalAmount,
-          status: payment.status,
-          method: payment.method || 'UNKNOWN',
-          approvedAt: payment.approvedAt ? new Date(payment.approvedAt) : new Date()
-        }
-      })
+        // 결제 내역 저장
+        await prisma.payment.create({
+          data: {
+            userId: session.user.id,
+            paymentKey: payment.paymentKey,
+            orderId: payment.orderId,
+            amount: payment.totalAmount || payment.amount,
+            status: payment.status,
+            method: payment.method || 'UNKNOWN',
+            approvedAt: payment.approvedAt ? new Date(payment.approvedAt) : new Date()
+          }
+        })
+      } catch (dbError) {
+        console.error('Database error during payment processing:', dbError)
+        // 결제는 성공했지만 DB 업데이트 실패
+        return NextResponse.json(
+          { error: '결제는 완료되었으나 시스템 처리 중 오류가 발생했습니다. 고객지원에 문의해주세요.' },
+          { status: 500 }
+        )
+      }
 
       return NextResponse.json({
         success: true,
