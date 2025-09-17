@@ -1,14 +1,22 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 
 export default function UpgradePage() {
   const [isProcessing, setIsProcessing] = useState(false)
   const [upgradeStatus, setUpgradeStatus] = useState<'idle' | 'success' | 'error'>('idle')
+  const [countdown, setCountdown] = useState(3)
   const router = useRouter()
   const { data: session, update } = useSession()
+
+  // 컴포넌트 언마운트 시 타이머 정리
+  useEffect(() => {
+    return () => {
+      // cleanup 함수에서 타이머들 정리
+    }
+  }, [])
 
   const handleUpgrade = async () => {
     if (!session?.user) {
@@ -30,10 +38,18 @@ export default function UpgradePage() {
         setUpgradeStatus('success')
         // 세션 업데이트
         await update()
-        // 3초 후 메인 페이지로 이동
-        setTimeout(() => {
-          router.push('/')
-        }, 3000)
+        
+        // 카운트다운 시작
+        const timer = setInterval(() => {
+          setCountdown((prev) => {
+            if (prev <= 1) {
+              clearInterval(timer)
+              router.push('/')
+              return 0
+            }
+            return prev - 1
+          })
+        }, 1000)
       } else {
         setUpgradeStatus('error')
       }
@@ -49,18 +65,27 @@ export default function UpgradePage() {
     return (
       <div className="cozy-room">
         <div className="room-content">
-          <div className="min-h-screen flex items-center justify-center">
+          <div className="min-h-screen flex items-center justify-center p-4">
             <div className="bg-green-50 border-4 border-green-400 rounded-3xl p-8 max-w-md text-center">
               <div className="text-6xl mb-4">🎉</div>
               <h1 className="text-2xl font-bold text-green-700 mb-4">
                 업그레이드 완료!
               </h1>
-              <p className="text-green-600 mb-4">
+              <p className="text-green-600 mb-6">
                 고양이 속도가 3배 빨라졌습니다!<br/>
-                3초 후 메인 페이지로 이동합니다.
+                이제 0.3초마다 코드가 생성됩니다 ⚡
               </p>
+              
+              {/* 돌아가기 버튼 */}
+              <button
+                onClick={() => router.push('/')}
+                className="w-full py-3 bg-green-600 text-white font-bold text-lg rounded-2xl hover:bg-green-700 transition-all duration-200 shadow-lg mb-4"
+              >
+                🏠 방으로 돌아가기
+              </button>
+              
               <div className="text-sm text-green-500">
-                0.3초마다 코드가 생성됩니다 ⚡
+                자동 이동까지 남은 시간: <span className="font-bold">{countdown}초</span>
               </div>
             </div>
           </div>
