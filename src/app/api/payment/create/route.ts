@@ -15,13 +15,18 @@ export async function POST(request: NextRequest) {
     // 주문 ID 생성 (고유값이어야 함)
     const orderId = `upgrade_${session.user.id}_${Date.now()}`
     
-    // 토스페이먼츠 결제 요청 데이터 (최소 필수 파라미터)
+    // 현재 요청 도메인을 기반으로 URL 생성
+    const host = request.headers.get('host')
+    const protocol = request.headers.get('x-forwarded-proto') || 'https'
+    const baseUrl = `${protocol}://${host}`
+    
+    // 토스페이먼츠 결제 요청 데이터
     const paymentData = {
       amount: amount,
       orderId: orderId,
       orderName: orderName,
-      successUrl: "https://givecat.onrender.com/payment/success",
-      failUrl: "https://givecat.onrender.com/payment/fail",
+      successUrl: `${baseUrl}/payment/success`,
+      failUrl: `${baseUrl}/payment/fail`,
     }
 
     return NextResponse.json({
