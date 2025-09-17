@@ -14,13 +14,13 @@ interface CodeGameProps {
   onUpgradeComplete?: () => void
 }
 
-export default function CodeGame({ onSuccess, disabled, codeHash, salt, isUpgraded: initialUpgraded = false, onUpgradeComplete }: CodeGameProps) {
+export default function CodeGame({ onSuccess, disabled, codeHash, salt, isUpgraded: initialUpgraded = false }: CodeGameProps) {
   const [currentCode, setCurrentCode] = useState('')
   const [isRunning, setIsRunning] = useState(false)
   const [catPressed, setCatPressed] = useState(false) // 고양이가 버튼을 눌렀는지
   const [manualInput, setManualInput] = useState('') // 사용자 직접 입력
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isUpgraded, setIsUpgraded] = useState(initialUpgraded) // 내부 업그레이드 상태
+  const [isUpgraded] = useState(initialUpgraded) // 내부 업그레이드 상태
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
   const generateAndDisplayCode = () => {

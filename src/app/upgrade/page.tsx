@@ -1,14 +1,27 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import Script from 'next/script'
 
 // 토스페이먼츠 타입 정의
+interface PaymentOptions {
+  amount: number
+  orderId: string
+  orderName: string
+  customerName: string
+  successUrl: string
+  failUrl: string
+}
+
+interface TossPaymentsInstance {
+  requestPayment: (method: string, options: PaymentOptions) => Promise<void>
+}
+
 declare global {
   interface Window {
-    TossPayments: any
+    TossPayments: (clientKey: string) => TossPaymentsInstance
   }
 }
 
@@ -16,7 +29,7 @@ export default function UpgradePage() {
   const [isProcessing, setIsProcessing] = useState(false)
   const [upgradeStatus, setUpgradeStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const [countdown, setCountdown] = useState(3)
-  const [tossPayments, setTossPayments] = useState<any>(null)
+  const [tossPayments, setTossPayments] = useState<TossPaymentsInstance | null>(null)
   const router = useRouter()
   const { data: session, update } = useSession()
 
