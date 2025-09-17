@@ -67,8 +67,8 @@ export default function UpgradePage() {
 
       const { paymentData } = await response.json()
 
-      // 토스페이먼츠 결제창 호출
-      await tossPayments.requestPayment('카드', {
+      // 토스페이먼츠 결제창 호출 (올바른 형식)
+      await tossPayments.requestPayment('CARD', {
         amount: paymentData.amount,
         orderId: paymentData.orderId,
         orderName: paymentData.orderName,
