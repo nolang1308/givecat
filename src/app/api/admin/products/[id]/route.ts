@@ -4,14 +4,15 @@ import { prisma } from '@/lib/prisma'
 // 상품 수정
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const resolvedParams = await params
     const body = await request.json()
     const { name, description, imageUrl, category, isActive } = body
     
     const product = await prisma.product.update({
-      where: { id: params.id },
+      where: { id: resolvedParams.id },
       data: {
         name,
         description,
@@ -37,11 +38,12 @@ export async function PUT(
 // 상품 삭제
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const resolvedParams = await params
     await prisma.product.delete({
-      where: { id: params.id }
+      where: { id: resolvedParams.id }
     })
     
     return NextResponse.json({ 

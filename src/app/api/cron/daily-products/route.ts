@@ -40,7 +40,7 @@ export async function GET() {
     const selectedProductIds = selectedProducts.map(p => p.id)
     
     // 새로운 일일 상품 목록 생성
-    const newDailyList = await prisma.dailyProductList.create({
+    await prisma.dailyProductList.create({
       data: {
         date: today,
         productIds: selectedProductIds
