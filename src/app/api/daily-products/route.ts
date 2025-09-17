@@ -50,14 +50,34 @@ export async function GET() {
     })
     
     // 오늘의 상품 정보 조회
-    const todayProduct = await prisma.product.findUnique({
+    let todayProduct = await prisma.product.findUnique({
       where: { id: dailyProductList.todayProductId }
     })
+    
+    // 오늘의 상품이 삭제되었거나 비활성화된 경우 새로운 상품 선택
+    if (!todayProduct || !todayProduct.isActive) {
+      if (allActiveProducts.length > 0) {
+        // 새로운 오늘의 상품 랜덤 선택
+        const newTodayProduct = allActiveProducts[Math.floor(Math.random() * allActiveProducts.length)]
+        
+        // DailyProductList 업데이트
+        await prisma.dailyProductList.update({
+          where: { date: today },
+          data: { todayProductId: newTodayProduct.id }
+        })
+        
+        todayProduct = newTodayProduct
+        console.log(`Today's product was missing/inactive. Selected new product: ${newTodayProduct.name}`)
+      } else {
+        todayProduct = null
+        console.log('No active products available for today\'s product')
+      }
+    }
     
     return NextResponse.json({
       date: today,
       products: allActiveProducts, // DB의 모든 활성 상품
-      todayProduct: todayProduct // 오늘의 상품 1개
+      todayProduct: todayProduct // 오늘의 상품 1개 (교체 가능)
     })
     
   } catch (error) {

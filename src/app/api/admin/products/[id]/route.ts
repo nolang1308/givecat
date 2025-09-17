@@ -8,11 +8,13 @@ export async function PUT(
 ) {
   try {
     const resolvedParams = await params
+    const productId = resolvedParams.id
     const body = await request.json()
     const { name, description, imageUrl, category, isActive } = body
     
+    // 상품 업데이트
     const product = await prisma.product.update({
-      where: { id: resolvedParams.id },
+      where: { id: productId },
       data: {
         name,
         description,
@@ -21,6 +23,31 @@ export async function PUT(
         isActive
       }
     })
+    
+    // 상품이 비활성화되고 그것이 오늘의 상품이었다면 새로운 상품 선택
+    if (!isActive) {
+      const today = new Date().toISOString().split('T')[0]
+      const dailyProductList = await prisma.dailyProductList.findUnique({
+        where: { date: today }
+      })
+      
+      if (dailyProductList && dailyProductList.todayProductId === productId) {
+        const activeProducts = await prisma.product.findMany({
+          where: { isActive: true }
+        })
+        
+        if (activeProducts.length > 0) {
+          const newTodayProduct = activeProducts[Math.floor(Math.random() * activeProducts.length)]
+          
+          await prisma.dailyProductList.update({
+            where: { date: today },
+            data: { todayProductId: newTodayProduct.id }
+          })
+          
+          console.log(`Deactivated product was today's product. Selected new product: ${newTodayProduct.name}`)
+        }
+      }
+    }
     
     return NextResponse.json({ 
       message: 'Product updated successfully',
@@ -42,9 +69,36 @@ export async function DELETE(
 ) {
   try {
     const resolvedParams = await params
-    await prisma.product.delete({
-      where: { id: resolvedParams.id }
+    const productId = resolvedParams.id
+    
+    // 삭제될 상품이 오늘의 상품인지 확인
+    const today = new Date().toISOString().split('T')[0]
+    const dailyProductList = await prisma.dailyProductList.findUnique({
+      where: { date: today }
     })
+    
+    // 상품 삭제
+    await prisma.product.delete({
+      where: { id: productId }
+    })
+    
+    // 삭제된 상품이 오늘의 상품이었다면 새로운 상품 선택
+    if (dailyProductList && dailyProductList.todayProductId === productId) {
+      const remainingActiveProducts = await prisma.product.findMany({
+        where: { isActive: true }
+      })
+      
+      if (remainingActiveProducts.length > 0) {
+        const newTodayProduct = remainingActiveProducts[Math.floor(Math.random() * remainingActiveProducts.length)]
+        
+        await prisma.dailyProductList.update({
+          where: { date: today },
+          data: { todayProductId: newTodayProduct.id }
+        })
+        
+        console.log(`Deleted product was today's product. Selected new product: ${newTodayProduct.name}`)
+      }
+    }
     
     return NextResponse.json({ 
       message: 'Product deleted successfully' 
