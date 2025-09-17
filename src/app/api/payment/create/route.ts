@@ -15,20 +15,14 @@ export async function POST(request: NextRequest) {
     // 주문 ID 생성 (고유값이어야 함)
     const orderId = `upgrade_${session.user.id}_${Date.now()}`
     
-    // 현재 도메인 기반으로 URL 생성 (프로덕션에서는 HTTPS 사용)
-    const host = request.headers.get('host')
-    const isProduction = host?.includes('vercel.app') || host?.includes('onrender.com')
-    const protocol = isProduction ? 'https' : 'http'
-    const baseUrl = `${protocol}://${host}`
-    
-    // 토스페이먼츠 결제 요청 데이터
+    // 토스페이먼츠 결제 요청 데이터 (고정 URL 사용)
     const paymentData = {
       amount: amount,
       orderId: orderId,
       orderName: orderName,
       customerName: session.user.nickname || session.user.email,
-      successUrl: `${baseUrl}/payment/success`,
-      failUrl: `${baseUrl}/payment/fail`,
+      successUrl: `https://givecat.onrender.com/payment/success`,
+      failUrl: `https://givecat.onrender.com/payment/fail`,
     }
 
     return NextResponse.json({
