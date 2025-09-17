@@ -17,6 +17,7 @@ model User {
   updatedAt DateTime @updatedAt
   
   attempts CodeAttempt[]
+  payments Payment[]
   @@map("users")
 }
 
@@ -66,4 +67,20 @@ model DailyProductList {
   createdAt DateTime @default(now())
   
   @@map("daily_product_lists")
+}
+
+model Payment {
+  id         String   @id @default(cuid())
+  userId     String
+  paymentKey String   @unique
+  orderId    String   @unique
+  amount     Int
+  status     String
+  method     String
+  approvedAt DateTime
+  createdAt  DateTime @default(now())
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("payments")
 }

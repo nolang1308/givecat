@@ -3,22 +3,75 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
+import Script from 'next/script'
+
+// 토스페이먼츠 타입 정의
+declare global {
+  interface Window {
+    TossPayments: any
+  }
+}
 
 export default function UpgradePage() {
   const [isProcessing, setIsProcessing] = useState(false)
   const [upgradeStatus, setUpgradeStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const [countdown, setCountdown] = useState(3)
+  const [tossPayments, setTossPayments] = useState<any>(null)
   const router = useRouter()
   const { data: session, update } = useSession()
 
-  // 컴포넌트 언마운트 시 타이머 정리
-  useEffect(() => {
-    return () => {
-      // cleanup 함수에서 타이머들 정리
+  // 토스페이먼츠 SDK 로드 후 초기화
+  const handleTossPaymentsLoad = () => {
+    if (window.TossPayments) {
+      const tp = window.TossPayments(process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY || 'test_ck_AQ92ymxN34vD9YX1oBn0rajRKXvd')
+      setTossPayments(tp)
     }
-  }, [])
+  }
 
-  const handleUpgrade = async () => {
+  const handlePayment = async () => {
+    if (!session?.user) {
+      alert('로그인이 필요합니다.')
+      router.push('/auth/signin')
+      return
+    }
+
+    if (!tossPayments) {
+      alert('결제 시스템을 로딩하고 있습니다. 잠시 후 다시 시도해주세요.')
+      return
+    }
+
+    setIsProcessing(true)
+    try {
+      // 결제 요청 생성
+      const response = await fetch('/api/payment/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: 1000, // 1000원 (테스트용)
+          orderName: '고양이 속도 업그레이드'
+        })
+      })
+
+      const { paymentData } = await response.json()
+
+      // 토스페이먼츠 결제창 호출
+      await tossPayments.requestPayment('카드', {
+        amount: paymentData.amount,
+        orderId: paymentData.orderId,
+        orderName: paymentData.orderName,
+        customerName: paymentData.customerName,
+        successUrl: paymentData.successUrl,
+        failUrl: paymentData.failUrl,
+      })
+    } catch (error) {
+      console.error('Payment error:', error)
+      alert('결제 요청 중 오류가 발생했습니다.')
+    } finally {
+      setIsProcessing(false)
+    }
+  }
+
+  const handleFreeUpgrade = async () => {
     if (!session?.user) {
       alert('로그인이 필요합니다.')
       router.push('/auth/signin')
@@ -36,7 +89,6 @@ export default function UpgradePage() {
 
       if (response.ok) {
         setUpgradeStatus('success')
-        // 세션 업데이트
         await update()
         
         // 카운트다운 시작
@@ -95,8 +147,15 @@ export default function UpgradePage() {
   }
 
   return (
-    <div className="cozy-room">
-      <div className="room-content">
+    <>
+      {/* 토스페이먼츠 SDK 로드 */}
+      <Script
+        src="https://js.tosspayments.com/v1/payment"
+        onLoad={handleTossPaymentsLoad}
+      />
+      
+      <div className="cozy-room">
+        <div className="room-content">
         <div className="min-h-screen py-8">
           {/* 뒤로가기 버튼 */}
           <div className="max-w-4xl mx-auto px-4 mb-6">
@@ -163,10 +222,10 @@ export default function UpgradePage() {
 
               {/* 가격 및 결제 */}
               <div className="bg-orange-500 rounded-2xl p-6 text-white mb-6">
-                <div className="text-4xl font-bold mb-2">$1.00</div>
-                <div className="text-orange-100 mb-4">일회성 결제</div>
+                <div className="text-4xl font-bold mb-2">₩1,000</div>
+                <div className="text-orange-100 mb-4">일회성 결제 (테스트용)</div>
                 <div className="text-sm text-orange-200">
-                  * 실제 결제는 되지 않으며, 데모용입니다
+                  * 토스페이먼츠 테스트 결제입니다
                 </div>
               </div>
 
@@ -177,20 +236,32 @@ export default function UpgradePage() {
                 </div>
               )}
 
-              <button
-                onClick={handleUpgrade}
-                disabled={isProcessing}
-                className="w-full py-4 bg-orange-600 text-white font-bold text-xl rounded-2xl hover:bg-orange-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
-              >
-                {isProcessing ? (
-                  <div className="flex items-center justify-center gap-2">
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    처리 중...
-                  </div>
-                ) : (
-                  '지금 업그레이드하기 🚀'
-                )}
-              </button>
+              <div className="space-y-3">
+                {/* 토스페이먼츠 결제 버튼 */}
+                <button
+                  onClick={handlePayment}
+                  disabled={isProcessing}
+                  className="w-full py-4 bg-blue-600 text-white font-bold text-xl rounded-2xl hover:bg-blue-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+                >
+                  {isProcessing ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      결제 처리 중...
+                    </div>
+                  ) : (
+                    '💳 카드로 결제하기 (₩1,000)'
+                  )}
+                </button>
+
+                {/* 무료 업그레이드 버튼 (테스트용) */}
+                <button
+                  onClick={handleFreeUpgrade}
+                  disabled={isProcessing}
+                  className="w-full py-3 bg-gray-600 text-white font-semibold text-lg rounded-2xl hover:bg-gray-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  🆓 무료 업그레이드 (테스트용)
+                </button>
+              </div>
 
               <p className="text-sm text-orange-600 mt-4">
                 업그레이드는 즉시 적용되며, 계정에 영구히 저장됩니다.
@@ -200,5 +271,6 @@ export default function UpgradePage() {
         </div>
       </div>
     </div>
+    </>
   )
 }
