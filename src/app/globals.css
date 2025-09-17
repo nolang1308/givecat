@@ -1324,6 +1324,19 @@ body {
   border-color: rgba(234, 88, 12, 0.3);
 }
 
+/* 오늘의 상품 스타일 */
+.product-card.today-product {
+  border: 3px solid #ff6b35;
+  background: linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%);
+  box-shadow: 0 8px 20px rgba(255, 107, 53, 0.3);
+  position: relative;
+}
+
+.product-card.today-product:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 25px rgba(255, 107, 53, 0.4);
+}
+
 .product-image-wrapper {
   position: relative;
   margin-bottom: 12px;
@@ -1381,6 +1394,21 @@ body {
   border-radius: 12px;
   font-size: 0.7rem;
   font-weight: 500;
+}
+
+.today-badge {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ff6b35;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 15px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(255, 107, 53, 0.4);
+  z-index: 10;
 }
 
 .products-note {

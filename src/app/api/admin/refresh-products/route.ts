@@ -25,33 +25,33 @@ export async function POST() {
       )
     }
     
-    // 랜덤하게 5개 상품 선택
-    const selectedProducts = activeProducts
-      .sort(() => 0.5 - Math.random())
-      .slice(0, Math.min(5, activeProducts.length))
-    
-    const selectedProductIds = selectedProducts.map(p => p.id)
+    // 모든 활성 상품 ID와 오늘의 상품 1개 랜덤 선택
+    const allProductIds = activeProducts.map(p => p.id)
+    const todayProductId = activeProducts[Math.floor(Math.random() * activeProducts.length)].id
+    const todayProduct = activeProducts.find(p => p.id === todayProductId)
     
     // 새로운 일일 상품 목록 생성
     await prisma.dailyProductList.create({
       data: {
         date: today,
-        productIds: selectedProductIds
+        productIds: allProductIds, // 모든 상품 ID
+        todayProductId: todayProductId // 오늘의 상품 1개
       }
     })
     
-    console.log(`Daily product list manually refreshed for ${today}:`, selectedProductIds)
+    console.log(`Daily product list manually refreshed for ${today}. Today's product:`, todayProduct?.name)
     
     return NextResponse.json({
       message: 'Daily product list refreshed successfully',
       date: today,
-      productIds: selectedProductIds,
-      productCount: selectedProductIds.length,
-      selectedProducts: selectedProducts.map(p => ({
-        id: p.id,
-        name: p.name,
-        category: p.category
-      }))
+      productIds: allProductIds,
+      todayProductId: todayProductId,
+      productCount: allProductIds.length,
+      todayProduct: {
+        id: todayProduct?.id,
+        name: todayProduct?.name,
+        category: todayProduct?.category
+      }
     })
     
   } catch (error) {

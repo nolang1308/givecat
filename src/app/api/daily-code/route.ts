@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { getTodayCode, getTodayAttempts, checkUserAttempt } from '@/lib/daily-code'
 import { hashCode } from '@/lib/crypto'
+import { prisma } from '@/lib/prisma'
 
 export async function GET() {
   try {
@@ -22,12 +23,25 @@ export async function GET() {
     const attempts = await getTodayAttempts()
     const userAttempt = await checkUserAttempt(session.user.id)
 
+    // 오늘의 상품 정보 가져오기
+    const today = new Date().toISOString().split('T')[0]
+    const dailyProductList = await prisma.dailyProductList.findUnique({
+      where: { date: today }
+    })
+    
+    let todayProduct = null
+    if (dailyProductList) {
+      todayProduct = await prisma.product.findUnique({
+        where: { id: dailyProductList.todayProductId }
+      })
+    }
+
     // 성공한 사용자들의 닉네임 목록 추출
     const successfulNicknames = attempts.map(attempt => attempt.user.nickname)
 
     return NextResponse.json({
-      productName: todayCode.productName,
-      productImage: todayCode.productImage,
+      productName: todayProduct?.name || todayCode.productName,
+      productImage: todayProduct?.imageUrl || todayCode.productImage,
       successCount: attempts.length,
       hasSucceeded: userAttempt?.success || false,
       successfulNicknames: successfulNicknames,

@@ -12,7 +12,7 @@ export async function GET() {
     
     // 오늘의 상품 목록이 없으면 생성
     if (!dailyProductList) {
-      // 활성화된 상품들 중에서 랜덤하게 5개 선택
+      // 활성화된 상품들 조회
       const activeProducts = await prisma.product.findMany({
         where: { isActive: true }
       })
@@ -23,47 +23,51 @@ export async function GET() {
         const newActiveProducts = await prisma.product.findMany({
           where: { isActive: true }
         })
-        const selectedProductIds = newActiveProducts
-          .sort(() => 0.5 - Math.random())
-          .slice(0, Math.min(5, newActiveProducts.length))
-          .map(p => p.id)
+        const allProductIds = newActiveProducts.map(p => p.id)
+        const todayProductId = newActiveProducts[Math.floor(Math.random() * newActiveProducts.length)].id
         
         dailyProductList = await prisma.dailyProductList.create({
           data: {
             date: today,
-            productIds: selectedProductIds
+            productIds: allProductIds, // 모든 상품 ID
+            todayProductId: todayProductId // 오늘의 상품 1개
           }
         })
       } else {
-        const selectedProductIds = activeProducts
-          .sort(() => 0.5 - Math.random())
-          .slice(0, Math.min(5, activeProducts.length))
-          .map(p => p.id)
+        const allProductIds = activeProducts.map(p => p.id)
+        const todayProductId = activeProducts[Math.floor(Math.random() * activeProducts.length)].id
         
         dailyProductList = await prisma.dailyProductList.create({
           data: {
             date: today,
-            productIds: selectedProductIds
+            productIds: allProductIds, // 모든 상품 ID
+            todayProductId: todayProductId // 오늘의 상품 1개
           }
         })
       }
     }
     
-    // 선택된 상품들의 상세 정보 조회
-    const products = await prisma.product.findMany({
+    // 전체 상품들의 상세 정보 조회
+    const allProducts = await prisma.product.findMany({
       where: {
         id: { in: dailyProductList.productIds }
       }
     })
     
+    // 오늘의 상품 정보 조회
+    const todayProduct = await prisma.product.findUnique({
+      where: { id: dailyProductList.todayProductId }
+    })
+    
     // productIds 순서대로 정렬
     const sortedProducts = dailyProductList.productIds.map(id => 
-      products.find(product => product.id === id)
+      allProducts.find(product => product.id === id)
     ).filter(Boolean)
     
     return NextResponse.json({
       date: today,
-      products: sortedProducts
+      products: sortedProducts, // 전체 상품 목록
+      todayProduct: todayProduct // 오늘의 상품 1개
     })
     
   } catch (error) {
