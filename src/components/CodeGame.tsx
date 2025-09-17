@@ -189,17 +189,6 @@ export default function CodeGame({ onSuccess, disabled, codeHash, salt, isUpgrad
     }
   }
 
-  const handleUpgrade = () => {
-    setIsUpgraded(true)
-    onUpgradeComplete?.()
-    // 게임이 실행 중이라면 새로운 속도로 재시작
-    if (isRunning) {
-      stopGame()
-      setTimeout(() => {
-        startGame()
-      }, 100)
-    }
-  }
 
   useEffect(() => {
     // 컴포넌트 마운트시 알림 권한 요청
@@ -250,7 +239,6 @@ export default function CodeGame({ onSuccess, disabled, codeHash, salt, isUpgrad
             <div className="absolute right-[-80px] top-1/2 transform -translate-y-1/2">
               <UpgradeButton 
                 isUpgraded={isUpgraded} 
-                onUpgrade={handleUpgrade}
               />
             </div>
           </div>
