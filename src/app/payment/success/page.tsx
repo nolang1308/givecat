@@ -22,7 +22,7 @@ function PaymentSuccessContent() {
           return
         }
 
-        const response = await fetch('/api/payment/confirm', {
+        const response = await fetch('/api/payment/confirm-simple', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
