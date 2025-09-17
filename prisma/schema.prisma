@@ -45,3 +45,25 @@ model CodeAttempt {
   @@unique([userId, codeId])
   @@map("code_attempts")
 }
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  imageUrl    String
+  category    String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("products")
+}
+
+model DailyProductList {
+  id        String   @id @default(cuid())
+  date      String   @unique // YYYY-MM-DD format
+  productIds String[] // 상품 ID 배열
+  createdAt DateTime @default(now())
+  
+  @@map("daily_product_lists")
+}

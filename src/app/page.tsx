@@ -7,6 +7,7 @@ import Image from 'next/image'
 import CodeGame from '@/components/CodeGame'
 import ElectronicBoard from '@/components/ElectronicBoard'
 import Advertisement from '@/components/Advertisement'
+import DailyProductList from '@/components/DailyProductList'
 
 interface DailyData {
   productName: string
@@ -211,6 +212,9 @@ export default function Home() {
             </div>
           </div>
         </div>
+        
+        {/* 상품목록 */}
+        <DailyProductList />
       </div>
     </div>
   )
