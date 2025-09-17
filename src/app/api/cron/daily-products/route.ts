@@ -32,15 +32,13 @@ export async function GET() {
       )
     }
     
-    // 모든 활성 상품 ID와 오늘의 상품 1개 랜덤 선택
-    const allProductIds = activeProducts.map(p => p.id)
+    // 오늘의 상품 1개 랜덤 선택
     const todayProductId = activeProducts[Math.floor(Math.random() * activeProducts.length)].id
     
     // 새로운 일일 상품 목록 생성
     await prisma.dailyProductList.create({
       data: {
         date: today,
-        productIds: allProductIds, // 모든 상품 ID
         todayProductId: todayProductId // 오늘의 상품 1개
       }
     })
@@ -50,9 +48,8 @@ export async function GET() {
     return NextResponse.json({
       message: 'Daily product list updated successfully',
       date: today,
-      productIds: allProductIds,
       todayProductId: todayProductId,
-      productCount: allProductIds.length
+      totalActiveProducts: activeProducts.length
     })
     
   } catch (error) {

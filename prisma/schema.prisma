@@ -62,7 +62,6 @@ model Product {
 model DailyProductList {
   id        String   @id @default(cuid())
   date      String   @unique // YYYY-MM-DD format
-  productIds String[] // 상품 ID 배열 (전체 목록용)
   todayProductId String // 오늘의 상품 ID (1개)
   createdAt DateTime @default(now())
   

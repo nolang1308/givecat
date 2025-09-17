@@ -23,35 +23,30 @@ export async function GET() {
         const newActiveProducts = await prisma.product.findMany({
           where: { isActive: true }
         })
-        const allProductIds = newActiveProducts.map(p => p.id)
         const todayProductId = newActiveProducts[Math.floor(Math.random() * newActiveProducts.length)].id
         
         dailyProductList = await prisma.dailyProductList.create({
           data: {
             date: today,
-            productIds: allProductIds, // 모든 상품 ID
             todayProductId: todayProductId // 오늘의 상품 1개
           }
         })
       } else {
-        const allProductIds = activeProducts.map(p => p.id)
         const todayProductId = activeProducts[Math.floor(Math.random() * activeProducts.length)].id
         
         dailyProductList = await prisma.dailyProductList.create({
           data: {
             date: today,
-            productIds: allProductIds, // 모든 상품 ID
             todayProductId: todayProductId // 오늘의 상품 1개
           }
         })
       }
     }
     
-    // 전체 상품들의 상세 정보 조회
-    const allProducts = await prisma.product.findMany({
-      where: {
-        id: { in: dailyProductList.productIds }
-      }
+    // DB의 모든 활성 상품 조회 (항상 최신 상품 목록 표시)
+    const allActiveProducts = await prisma.product.findMany({
+      where: { isActive: true },
+      orderBy: { createdAt: 'desc' }
     })
     
     // 오늘의 상품 정보 조회
@@ -59,14 +54,9 @@ export async function GET() {
       where: { id: dailyProductList.todayProductId }
     })
     
-    // productIds 순서대로 정렬
-    const sortedProducts = dailyProductList.productIds.map(id => 
-      allProducts.find(product => product.id === id)
-    ).filter(Boolean)
-    
     return NextResponse.json({
       date: today,
-      products: sortedProducts, // 전체 상품 목록
+      products: allActiveProducts, // DB의 모든 활성 상품
       todayProduct: todayProduct // 오늘의 상품 1개
     })
     
