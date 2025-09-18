@@ -16,13 +16,19 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "오늘의 코드 게임 | 매일 새로운 도전",
   description: "매일 한국시간 00:00에 새로운 10자리 코드가 생성됩니다. 코드를 맞춰서 특별한 선물을 받아보세요! 자동 코드 생성기로 쉽고 재미있게 참여하세요.",
-  keywords: "코드게임, 이벤트, 선물, 게임, 프로모션, 온라인게임",
+  keywords: "코드게임, 이벤트, 선물, 게임, 프로모션, 온라인게임, 매일코드, 코드맞추기",
   authors: [{ name: "Daily Code Game" }],
   viewport: "width=device-width, initial-scale=1",
   robots: "index, follow",
+  metadataBase: new URL('https://giftcat.vercel.app'),
+  alternates: {
+    canonical: '/',
+  },
   openGraph: {
     title: "오늘의 코드 게임",
     description: "매일 새로운 코드를 맞춰서 선물을 받아보세요!",
+    url: "https://giftcat.vercel.app",
+    siteName: "오늘의 코드 게임",
     type: "website",
     locale: "ko_KR",
   },

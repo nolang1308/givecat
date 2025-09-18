@@ -236,11 +236,11 @@ export default function CodeGame({ onSuccess, disabled, codeHash, salt, isUpgrad
             />
             
             {/* 업그레이드 버튼 (고양이 오른쪽) */}
-            <div className="absolute right-[-80px] top-1/2 transform -translate-y-1/2">
-              <UpgradeButton 
-                isUpgraded={isUpgraded} 
-              />
-            </div>
+            {/*<div className="absolute right-[-80px] top-1/2 transform -translate-y-1/2">*/}
+            {/*  <UpgradeButton */}
+            {/*    isUpgraded={isUpgraded} */}
+            {/*  />*/}
+            {/*</div>*/}
           </div>
         </div>
 
