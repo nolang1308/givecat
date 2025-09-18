@@ -47,6 +47,7 @@ export default function RootLayout({
   return (
     <html lang="ko">
     <head>
+      <meta name="google-site-verification" content="9kNOoEMms0M0R4NZV98dVMrmPsb15VsLhcpEO2rSUa0" />
       <link rel="canonical" href="/"/>
       <meta name="theme-color" content="#4F46E5"/>
       <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
