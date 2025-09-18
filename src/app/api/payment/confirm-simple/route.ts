@@ -18,11 +18,53 @@ export async function POST(request: NextRequest) {
     const { paymentKey, orderId, amount } = await request.json()
     console.log('Request data:', { paymentKey: !!paymentKey, orderId: !!orderId, amount })
     
-    // 3. 사용자 업그레이드 처리
+    if (!paymentKey || !orderId || !amount) {
+      return NextResponse.json({ error: '결제 데이터가 누락되었습니다.' }, { status: 400 })
+    }
+
+    // 3. 토스페이먼츠 결제 검증
+    try {
+      console.log('Verifying payment with TossPayments...')
+      
+      const tossResponse = await fetch(`https://api.tosspayments.com/v1/payments/${paymentKey}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Basic ${Buffer.from(process.env.TOSS_SECRET_KEY + ':').toString('base64')}`,
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (!tossResponse.ok) {
+        console.error('TossPayments verification failed:', await tossResponse.text())
+        return NextResponse.json(
+          { error: '결제 검증에 실패했습니다.' },
+          { status: 400 }
+        )
+      }
+
+      const paymentData = await tossResponse.json()
+      console.log('Payment verified:', { status: paymentData.status, amount: paymentData.totalAmount })
+
+      // 결제 상태 및 금액 확인
+      if (paymentData.status !== 'DONE' || paymentData.totalAmount !== parseInt(amount.toString())) {
+        return NextResponse.json(
+          { error: '결제 정보가 일치하지 않습니다.' },
+          { status: 400 }
+        )
+      }
+
+    } catch (verifyError) {
+      console.error('Payment verification error:', verifyError)
+      return NextResponse.json(
+        { error: '결제 검증 중 오류가 발생했습니다.' },
+        { status: 500 }
+      )
+    }
+    
+    // 4. 사용자 업그레이드 처리
     try {
       console.log('Updating user upgrade status...')
       
-      // Prisma import 추가 필요 - 아래에서 수정
       const { prisma } = await import('@/lib/prisma')
       
       // 사용자 업그레이드
@@ -41,7 +83,7 @@ export async function POST(request: NextRequest) {
           orderId: orderId,
           amount: parseInt(amount.toString()),
           status: 'DONE',
-          method: 'TEST',
+          method: 'CARD',
           approvedAt: new Date()
         }
       })
