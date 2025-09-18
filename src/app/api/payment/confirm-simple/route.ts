@@ -16,7 +16,13 @@ export async function POST(request: NextRequest) {
 
     // 2. 요청 데이터 파싱
     const { paymentKey, orderId, amount } = await request.json()
-    console.log('Request data:', { paymentKey: !!paymentKey, orderId: !!orderId, amount })
+    console.log('Request data:', { 
+      paymentKey: !!paymentKey, 
+      orderId: !!orderId, 
+      amount,
+      amountType: typeof amount,
+      amountParsed: parseInt(amount.toString())
+    })
     
     if (!paymentKey || !orderId || !amount) {
       return NextResponse.json({ error: '결제 데이터가 누락되었습니다.' }, { status: 400 })
@@ -43,12 +49,34 @@ export async function POST(request: NextRequest) {
       }
 
       const paymentData = await tossResponse.json()
-      console.log('Payment verified:', { status: paymentData.status, amount: paymentData.totalAmount })
+      console.log('Payment verified:', { 
+        status: paymentData.status, 
+        totalAmount: paymentData.totalAmount, 
+        requestAmount: amount,
+        requestAmountParsed: parseInt(amount.toString())
+      })
 
-      // 결제 상태 및 금액 확인
-      if (paymentData.status !== 'DONE' || paymentData.totalAmount !== parseInt(amount.toString())) {
+      // 결제 상태 확인
+      if (paymentData.status !== 'DONE') {
+        console.error('Payment status mismatch:', { expected: 'DONE', actual: paymentData.status })
         return NextResponse.json(
-          { error: '결제 정보가 일치하지 않습니다.' },
+          { error: '결제가 완료되지 않았습니다.' },
+          { status: 400 }
+        )
+      }
+
+      // 금액 확인 (더 유연한 비교)
+      const requestAmount = parseInt(amount.toString())
+      const paidAmount = paymentData.totalAmount
+      
+      if (paidAmount !== requestAmount) {
+        console.error('Payment amount mismatch:', { 
+          expected: requestAmount, 
+          actual: paidAmount,
+          diff: Math.abs(paidAmount - requestAmount)
+        })
+        return NextResponse.json(
+          { error: `결제 금액이 일치하지 않습니다. (요청: ${requestAmount}원, 실제: ${paidAmount}원)` },
           { status: 400 }
         )
       }
