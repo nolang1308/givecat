@@ -28,28 +28,34 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: '결제 데이터가 누락되었습니다.' }, { status: 400 })
     }
 
-    // 3. 토스페이먼츠 결제 검증
+    // 3. 토스페이먼츠 결제 승인
     try {
-      console.log('Verifying payment with TossPayments...')
+      console.log('Confirming payment with TossPayments...')
       
-      const tossResponse = await fetch(`https://api.tosspayments.com/v1/payments/${paymentKey}`, {
-        method: 'GET',
+      const confirmResponse = await fetch('https://api.tosspayments.com/v1/payments/confirm', {
+        method: 'POST',
         headers: {
           'Authorization': `Basic ${Buffer.from(process.env.TOSS_SECRET_KEY + ':').toString('base64')}`,
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify({
+          paymentKey,
+          orderId,
+          amount: parseInt(amount.toString())
+        })
       })
 
-      if (!tossResponse.ok) {
-        console.error('TossPayments verification failed:', await tossResponse.text())
+      if (!confirmResponse.ok) {
+        const errorText = await confirmResponse.text()
+        console.error('TossPayments confirmation failed:', errorText)
         return NextResponse.json(
-          { error: '결제 검증에 실패했습니다.' },
+          { error: '결제 승인에 실패했습니다.' },
           { status: 400 }
         )
       }
 
-      const paymentData = await tossResponse.json()
-      console.log('Payment verified:', { 
+      const paymentData = await confirmResponse.json()
+      console.log('Payment confirmed:', { 
         status: paymentData.status, 
         totalAmount: paymentData.totalAmount, 
         requestAmount: amount,
@@ -65,7 +71,7 @@ export async function POST(request: NextRequest) {
         )
       }
 
-      // 금액 확인 (더 유연한 비교)
+      // 금액 확인
       const requestAmount = parseInt(amount.toString())
       const paidAmount = paymentData.totalAmount
       
