@@ -251,7 +251,7 @@ export default function AdminProductsPage() {
                     src={product.imageUrl}
                     alt={product.name}
                     fill
-                    className="object-cover rounded"
+                    className="object-contain rounded"
                     onError={(e) => {
                       e.currentTarget.src = '/cat_2.png'
                     }}

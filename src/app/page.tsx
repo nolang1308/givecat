@@ -134,7 +134,7 @@ export default function Home() {
                     alt={dailyData.productName}
                     width={240}
                     height={240}
-                    className="object-cover rounded-lg w-full h-full"
+                    className="object-contain rounded-lg w-full h-full"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement
                       target.src = '/placeholder-product.jpg'
@@ -168,7 +168,7 @@ export default function Home() {
                     alt={dailyData.productName}
                     width={240}
                     height={240}
-                    className="object-cover rounded-lg w-full h-full"
+                    className="object-contain rounded-lg w-full h-full"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement
                       target.src = '/placeholder-product.jpg'
